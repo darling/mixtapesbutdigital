@@ -3,14 +3,27 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import { api } from "~/utils/api";
-import { first } from "lodash-es";
+import { ceil, first } from "lodash-es";
 import { Layout } from "~/components/layout";
+import { useEffect, useState } from "react";
+import { Container } from "~/components/ui/container";
 
 const Page: NextPage = () => {
-  const spotifyRequest = api.spotify.getPlaylists.useQuery();
-
   const { user, isSignedIn } = useUser();
   const { signOut } = useAuth();
+
+  const [page, setPage] = useState<number>(0);
+  const [totalPages, setTotalPages] = useState<number>(0);
+  const spotifyRequest = api.spotify.getPlaylists.useQuery({
+    page,
+  });
+
+  useEffect(() => {
+    if (spotifyRequest.data) {
+      setTotalPages(ceil(spotifyRequest.data.total / 50));
+    }
+    return;
+  }, [page, spotifyRequest.data]);
 
   return (
     <>
@@ -20,11 +33,27 @@ const Page: NextPage = () => {
       <Layout>
         <h1 className="text-4xl font-bold">Playlists</h1>
         <Link href="/">Back</Link>
-        {/* <pre>
-          <code>{JSON.stringify(spotifyRequest, null, 2)}</code>
-        </pre> */}
         {isSignedIn ? <p>Hi {user.id}.</p> : <p>Not signed in</p>}
-        <div className="max-w-4xl">
+        <Container>
+          <div>
+            <p>
+              Page {page + 1} of {totalPages}
+            </p>
+            <button
+              onClick={() => {
+                if (page > 0) setPage(page - 1);
+              }}
+            >
+              Previous Page
+            </button>
+            <button
+              onClick={() => {
+                if (page < totalPages - 1) setPage(page + 1);
+              }}
+            >
+              Next Page
+            </button>
+          </div>
           <div className="grid grid-cols-4">
             {spotifyRequest.data?.items.map((playlist) => {
               return (
@@ -33,14 +62,14 @@ const Page: NextPage = () => {
                   <img
                     src={first(playlist.images)?.url}
                     alt={playlist.name}
-                    className="w-full"
+                    className="aspect-square w-full overflow-hidden"
                   />
-                  <p>{playlist.name}</p>
+                  <p className="truncate">{playlist.name}</p>
                 </Link>
               );
             })}
           </div>
-        </div>
+        </Container>
         <img src={user?.profileImageUrl} alt="Profile Picture" />
         <Link href="/sign-in">Sign In</Link>
         <Link href="/sign-up">Sign Up</Link>

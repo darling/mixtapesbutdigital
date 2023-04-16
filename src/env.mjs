@@ -9,6 +9,10 @@ const server = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]),
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string(),
   CLERK_SECRET_KEY: z.string(),
+  UPSTASH_URL: z.string(),
+  UPSTASH_TOKEN: z.string(),
+  SPOTIFY_CLIENT_ID: z.string(),
+  SPOTIFY_CLIENT_SECRET: z.string(),
 });
 
 /**
@@ -31,6 +35,10 @@ const processEnv = {
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+  UPSTASH_URL: process.env.UPSTASH_URL,
+  UPSTASH_TOKEN: process.env.UPSTASH_TOKEN,
+  SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
+  SPOTIFY_CLIENT_SECRET: process.env.SPOTIFY_CLIENT_SECRET,
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 

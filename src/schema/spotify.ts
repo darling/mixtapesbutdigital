@@ -15,10 +15,23 @@ const ImageSchema = z.object({
   width: z.number().nullable(),
 });
 
+const ArtistSchema = z.object({
+  external_urls: ExternalUrlsSchema,
+  followers: FollowersSchema.optional(),
+  genres: z.array(z.string()).optional(),
+  href: z.string(),
+  id: z.string(),
+  images: z.array(ImageSchema).optional(),
+  name: z.string(),
+  popularity: z.number().optional(),
+  type: z.literal("artist"),
+  uri: z.string(),
+});
+
 // Track schema is a simplified version. You can extend it with more properties if needed.
 const TrackSchema = z.object({
   album: z.unknown(), // Simplified, you can use the AlbumSchema from previous examples if needed.
-  artists: z.unknown(), // Simplified, you can use the ArtistSchema from previous examples if needed.
+  artists: z.array(ArtistSchema), // Simplified, you can use the ArtistSchema from previous examples if needed.
   available_markets: z.array(z.string()),
   disc_number: z.number(),
   duration_ms: z.number(),

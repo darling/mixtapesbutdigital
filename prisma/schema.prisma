@@ -2,16 +2,46 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
 }
 
-model Example {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Mixtape {
+  id String @id @default(cuid())
+  owner String
+
+  title String?
+  songs Song[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Song {
+  id        String @id @default(cuid())
+
+  Mixtape   Mixtape @relation(fields: [mixtapeId], references: [id])
+  mixtapeId String
+
+  spotifyId String
+  
+  // Users should be able to add data to songs to personalize their mixtapes
+  pre_description String?
+  post_description String?
+  notes String?
+
+  image String?
+  second_image String?
+
+  location String?
+  datetime DateTime?
+
+  color String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
