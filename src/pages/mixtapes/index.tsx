@@ -12,6 +12,14 @@ const Page: NextPage = () => {
 
   const mixtapesRequest = api.mixtapes.getMixtapes.useQuery();
 
+  const deletedMixtape = api.mixtapes.deleteMixtape.useMutation();
+
+  const handleDelete = async (id: string) => {
+    const res = await deletedMixtape.mutateAsync({ id });
+    console.log(res);
+    await mixtapesRequest.refetch();
+  };
+
   return (
     <>
       <Head>
@@ -20,14 +28,27 @@ const Page: NextPage = () => {
       <Layout>
         <Container>
           <h1 className="text-4xl font-bold">Mixtapes</h1>
-          <div className="grid grid-cols-4">
+          <div className="grid grid-cols-2 gap-8">
             {mixtapesRequest.data?.map((mixtape) => {
               return (
-                <Link href={`/mixtapes/${mixtape.id}`} key={mixtape.id}>
-                  <div className="p-4">
-                    {mixtape.title} {mixtape.id}
+                <div key={mixtape.id}>
+                  <Link href={`/mixtapes/${mixtape.id}`}>
+                    <div className="h-32 bg-stone-200">
+                      {mixtape.title || "Untitled Mixtape"}
+                    </div>
+                  </Link>
+                  <div>
+                    <button
+                      onClick={() => {
+                        handleDelete(mixtape.id).catch((e) => {
+                          console.error(e);
+                        });
+                      }}
+                    >
+                      Delete
+                    </button>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>

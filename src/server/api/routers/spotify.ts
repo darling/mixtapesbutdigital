@@ -4,10 +4,6 @@ import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
-import {
-  PlaylistFullSchema,
-  CurrentUsersPlaylistsResponseSchema,
-} from "~/schema/spotify";
 import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
 
 export const spotifyRouter = createTRPCRouter({
@@ -49,9 +45,7 @@ export const spotifyRouter = createTRPCRouter({
           }
         );
 
-      // parse data with zod
-      const parsed = CurrentUsersPlaylistsResponseSchema.parse(response.data);
-      return parsed;
+      return response.data;
     }),
   getPlaylist: publicProcedure
     .input(
@@ -86,9 +80,7 @@ export const spotifyRouter = createTRPCRouter({
         }
       );
 
-      // parse data with zod
-      const parsed = PlaylistFullSchema.parse(response.data);
-      return parsed;
+      return response.data;
     }),
   getTracks: publicProcedure
     .input(

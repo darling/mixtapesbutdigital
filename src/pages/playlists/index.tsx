@@ -31,9 +31,6 @@ const Page: NextPage = () => {
         <title>T3</title>
       </Head>
       <Layout>
-        <h1 className="text-4xl font-bold">Playlists</h1>
-        <Link href="/">Back</Link>
-        {isSignedIn ? <p>Hi {user.id}.</p> : <p>Not signed in</p>}
         <Container>
           <div>
             <p>
@@ -70,16 +67,6 @@ const Page: NextPage = () => {
             })}
           </div>
         </Container>
-        <img src={user?.profileImageUrl} alt="Profile Picture" />
-        <Link href="/sign-in">Sign In</Link>
-        <Link href="/sign-up">Sign Up</Link>
-        <button
-          onClick={() => {
-            signOut().catch((err) => console.error(err));
-          }}
-        >
-          Sign Out
-        </button>
       </Layout>
     </>
   );
