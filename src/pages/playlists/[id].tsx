@@ -31,6 +31,7 @@ const Page: NextPage = () => {
   const createMixtape = () => {
     mixtapes.mutate({
       songs: selectedSongs,
+      title: spotifyRequest.data?.name,
     });
 
     setPostCreationAlert(true);

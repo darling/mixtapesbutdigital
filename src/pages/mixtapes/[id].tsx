@@ -1,23 +1,27 @@
-import {
-  type GetServerSideProps,
-  type InferGetServerSidePropsType,
-  type NextPage,
+import { toString } from "lodash-es";
+import type {
+  GetServerSideProps,
+  InferGetServerSidePropsType,
+  NextPage,
 } from "next";
 import Head from "next/head";
-import { api } from "~/utils/api";
+import { useRouter } from "next/router";
 import { Layout } from "~/components/layout";
 import { Container } from "~/components/ui/container";
-import { useRouter } from "next/router";
-import { toString } from "lodash-es";
-import type { Mixtape, Song } from "@prisma/client";
-import { prisma } from "~/server/db";
-import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
-import { MixtapeSong } from "~/types/song";
 import { SongDisplay } from "~/components/ui/mixtape/song";
+import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
+import { prisma } from "~/server/db";
+import { api } from "~/utils/api";
+
+import type { Mixtape, Song } from "@prisma/client";
+import type { MixtapeSong } from "~/types/song";
+import { useAuth, useSignIn } from "@clerk/nextjs";
 
 const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
   props
 ) => {
+  const { signIn } = useSignIn();
+  const auth = useAuth();
   const router = useRouter();
   const id = toString(router.query.id);
 
@@ -49,8 +53,17 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
 
   const mutation = api.spotify.playTracks.useMutation();
 
-  const playMixtapeOnSpotify = () => {
-    mutation.mutate({
+  const playMixtapeOnSpotify = async () => {
+    if (!auth.isSignedIn) {
+      await signIn?.authenticateWithRedirect({
+        strategy: "oauth_spotify",
+        redirectUrl: `/mixtapes/${id}`,
+        redirectUrlComplete: `/mixtapes/${id}`,
+      });
+      return;
+    }
+
+    await mutation.mutateAsync({
       trackIds: mixtapesRequest.data.songs.map((song) => song.spotifyId),
     });
   };
@@ -75,12 +88,18 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
       </Head>
       <Layout>
         <Container>
-          <h1 className="text-4xl font-bold">A Mixtape</h1>
+          <h1 className="text-4xl font-bold">
+            {mixtapesRequest.data.title || "Untitled Mixtape"}
+          </h1>
           <button
             className="rounded bg-green-500 p-2 text-white"
-            onClick={playMixtapeOnSpotify}
+            onClick={() => {
+              playMixtapeOnSpotify().catch((err) => {
+                console.error(err);
+              });
+            }}
           >
-            Play on Spotify
+            {auth.isSignedIn ? "Play on Spotify" : "Sign in with Spotify"}
           </button>
         </Container>
         <div className="flex flex-col">

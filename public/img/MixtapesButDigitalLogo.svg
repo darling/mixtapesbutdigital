@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 679 679" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(1,0,0,1,-200.82,-200.82)">
+        <g transform="matrix(0.866025,-0.5,0.5,0.866025,171.173,441.173)">
+            <g id="Branding">
+                <path d="M540,81C540,36.295 503.705,0 459,0L81,0C36.295,0 0,36.295 0,81L0,459C0,503.705 36.295,540 81,540L459,540C503.705,540 540,503.705 540,459L540,81Z" style="fill:rgb(68,64,60);"/>
+            </g>
+        </g>
+    </g>
+</svg>
