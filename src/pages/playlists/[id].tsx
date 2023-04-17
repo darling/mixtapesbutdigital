@@ -10,6 +10,7 @@ import { TrackSelection } from "~/components/ui/spotify/track-selection";
 import { InformationCircleIcon, UsersIcon } from "@heroicons/react/24/solid";
 import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import * as Dialog from "@radix-ui/react-dialog";
+import { BackButton } from "~/components/ui/back";
 
 const Page: NextPage = () => {
   const { query } = useRouter();
@@ -37,7 +38,7 @@ const Page: NextPage = () => {
     setPostCreationAlert(true);
   };
 
-  const [postCreationAlert, setPostCreationAlert] = useState(false);
+  const [postCreationAlert, setPostCreationAlert] = useState(true);
 
   return (
     <>
@@ -77,15 +78,7 @@ const Page: NextPage = () => {
       <Layout>
         <Container>
           <div className="grid gap-4">
-            <div className="">
-              <Link
-                className="flex items-center text-gray-500
-              "
-                href="/playlists"
-              >
-                <ChevronLeftIcon className="mr-2 h-5 w-5" /> Back to playlists
-              </Link>
-            </div>
+            <BackButton href="/playlists">Return to playlists</BackButton>
             <div className="lg:flex lg:items-center lg:justify-between">
               <div className="min-w-0 flex-1">
                 <h1 className="text-2xl font-bold sm:text-3xl">

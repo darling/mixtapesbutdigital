@@ -4,20 +4,15 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { getClientCredentialsToken, getTracks } from "../spotify";
 import { compact } from "lodash-es";
-import { deleteMixtape } from "../mixtapes";
+import { deleteMixtape, getMixtape } from "../mixtapes";
+import { EditMixtapeSchema } from "~/schema/mixtape";
+import { Mixtape, Song } from "@prisma/client";
 
 export const mixtapesRouter = createTRPCRouter({
   getMixtape: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const mixtape = await ctx.prisma.mixtape.findUnique({
-        where: {
-          id: input.id,
-        },
-        include: {
-          songs: true,
-        },
-      });
+      const mixtape = await getMixtape(input.id);
 
       if (!mixtape) {
         throw new TRPCError({
@@ -36,11 +31,19 @@ export const mixtapesRouter = createTRPCRouter({
       });
     }
 
+    const cache = await ctx.redis.get<Mixtape[]>("mixtapes:" + auth.userId);
+
+    if (cache) {
+      return cache;
+    }
+
     const mixtapes = await ctx.prisma.mixtape.findMany({
       where: {
         owner: auth.userId,
       },
     });
+
+    await ctx.redis.set("mixtapes:" + auth.userId, mixtapes);
 
     return mixtapes;
   }),
@@ -86,6 +89,8 @@ export const mixtapesRouter = createTRPCRouter({
         },
       });
 
+      await ctx.redis.del("mixtapes:" + auth.userId);
+
       return mixtape;
     }),
   deleteMixtape: publicProcedure
@@ -120,8 +125,58 @@ export const mixtapesRouter = createTRPCRouter({
         });
       }
 
+      await ctx.redis.del("mixtapes:" + auth.userId);
       await deleteMixtape(mixtape.id);
 
       return true;
+    }),
+  editMixtape: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        mixtape: EditMixtapeSchema,
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const auth = ctx.auth;
+
+      if (!auth || !auth.userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
+
+      const mixtape = await ctx.prisma.mixtape.findUnique({
+        where: {
+          id: input.id,
+        },
+      });
+
+      if (!mixtape) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
+
+      if (mixtape.owner !== auth.userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
+
+      const updatedMixtape = await ctx.prisma.mixtape.update({
+        where: {
+          id: input.id,
+        },
+        data: input.mixtape,
+        include: {
+          songs: true,
+        },
+      });
+
+      await ctx.redis.set(`mixtape:${input.id}`, updatedMixtape);
+      await ctx.redis.del("mixtapes:" + auth.userId);
+
+      return updatedMixtape;
     }),
 });

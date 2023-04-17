@@ -10,5 +10,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/forms"), require("tailwindcss-radix")()],
 } satisfies Config;

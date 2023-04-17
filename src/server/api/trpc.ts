@@ -16,7 +16,7 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 
-import { prisma } from "~/server/db";
+import { prisma, redis } from "~/server/db";
 
 import { getAuth } from "@clerk/nextjs/server";
 import type {
@@ -26,6 +26,7 @@ import type {
 
 type CreateContextOptions = {
   auth: SignedInAuthObject | SignedOutAuthObject;
+  redis: Redis;
 };
 
 /**
@@ -38,10 +39,11 @@ type CreateContextOptions = {
  *
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
-const createInnerTRPCContext = ({ auth }: CreateContextOptions) => {
+const createInnerTRPCContext = ({ auth, redis }: CreateContextOptions) => {
   return {
     prisma,
     auth,
+    redis,
   };
 };
 
@@ -54,6 +56,7 @@ const createInnerTRPCContext = ({ auth }: CreateContextOptions) => {
 export const createTRPCContext = (opts: CreateNextContextOptions) => {
   return createInnerTRPCContext({
     auth: getAuth(opts.req),
+    redis: redis,
   });
 };
 
@@ -67,6 +70,7 @@ export const createTRPCContext = (opts: CreateNextContextOptions) => {
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
+import { Redis } from "@upstash/redis";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

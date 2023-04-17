@@ -5,6 +5,7 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
+import { getMixtape } from "../mixtapes";
 
 export const spotifyRouter = createTRPCRouter({
   getPlaylists: publicProcedure
@@ -85,11 +86,25 @@ export const spotifyRouter = createTRPCRouter({
   getTracks: publicProcedure
     .input(
       z.object({
-        trackIds: z.array(z.string()).min(1).max(5),
+        mixtapeId: z.string(),
       })
     )
     .query(async ({ ctx, input }) => {
-      const { trackIds } = input;
+      const mixtape = await getMixtape(input.mixtapeId);
+
+      if (!mixtape) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const cache = await ctx.redis.get<SpotifyApi.MultipleTracksResponse>(
+        `spotify:tracks:${mixtape.id}`
+      );
+
+      if (cache) {
+        return cache;
+      }
+
+      const trackIds = mixtape.songs.map((song) => song.spotifyId);
       const auth = ctx.auth;
       let token;
 
@@ -109,16 +124,29 @@ export const spotifyRouter = createTRPCRouter({
         token = firstItem.token;
       }
 
-      return getTracks(token, trackIds);
+      const freshTracks = await getTracks(token, trackIds);
+
+      await ctx.redis.set(`spotify:tracks:${mixtape.id}`, freshTracks, {
+        ex: 60 * 30,
+      });
+
+      return freshTracks;
     }),
   playTracks: publicProcedure
     .input(
       z.object({
-        trackIds: z.array(z.string()).min(1).max(5),
+        mixtapeId: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { trackIds } = input;
+      const mixtape = await getMixtape(input.mixtapeId);
+
+      if (!mixtape) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const trackIds = mixtape.songs.map((song) => song.spotifyId);
+
       const auth = ctx.auth;
 
       if (!auth || !auth.sessionId) {
