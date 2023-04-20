@@ -83,10 +83,12 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
     };
   });
 
+  const title = mixtapesRequest.data.title || "Untitled Mixtape";
+
   return (
     <>
       <Head>
-        <title>T3</title>
+        <title>{title}</title>
       </Head>
       <Layout>
         <Container>

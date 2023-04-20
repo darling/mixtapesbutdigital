@@ -42,40 +42,54 @@ const Page: NextPage = () => {
           <div className="py-12">
             <PageHeader title="Create a Mixtape" />
             <p>
-              To create a mixtape you need to first collect the 5 songs you want
-              in a Spotify playlist. Then, you can create a mixtape from that
-              playlist.
+              To create a mixtape you need to first collect up to 5 songs you
+              want inside a Spotify playlist. Then, you can create a mixtape
+              from that playlist.
             </p>
           </div>
         </Container>
         <Container>
-          <div className="grid grid-cols-2 gap-4">
-            {spotifyRequest.data?.items.map((playlist) => {
-              return (
-                <div className="" key={playlist.id}>
-                  <Link href={`/playlists/${playlist.id}`}>
-                    <div className="">
-                      <div className="aspect-square overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={first(playlist.images)?.url}
-                          alt={playlist.name}
-                        />
+          <div hidden={spotifyRequest.isLoading}>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 sm:gap-x-6 lg:grid-cols-4">
+              {spotifyRequest.data?.items.map((playlist) => {
+                return (
+                  <div className="" key={playlist.id}>
+                    <Link href={`/playlists/${playlist.id}`}>
+                      <div className="">
+                        <div className="aspect-square overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={first(playlist.images)?.url}
+                            alt={playlist.name}
+                            className="h-full w-full bg-stone-200 object-cover"
+                          />
+                        </div>
+                        <p className="pointer-events-none mt-2 block truncate text-sm font-medium">
+                          {playlist.name}
+                        </p>
+                        <p className="pointer-events-none block text-sm font-medium text-stone-500">
+                          {playlist.tracks.total} song
+                          {playlist.tracks.total > 1 && "s"}
+                        </p>
                       </div>
-                      <p className="truncate">{playlist.name}</p>
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <Pagination
-            currentIndex={page}
-            totalPages={totalPages}
-            onPageChange={(page) => {
-              setPage(page);
-            }}
-          />
+          <div hidden={!spotifyRequest.isLoading}>
+            <div className="animate-pulse">Loading...</div>
+          </div>
+          <div className="mt-12">
+            <Pagination
+              currentIndex={page}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                setPage(page);
+              }}
+            />
+          </div>
         </Container>
       </Layout>
     </>
