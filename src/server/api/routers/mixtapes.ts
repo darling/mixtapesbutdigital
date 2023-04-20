@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { getClientCredentialsToken, getTracks } from "../spotify";
-import { compact } from "lodash-es";
+import { compact, isEmpty } from "lodash-es";
 import { deleteMixtape, getMixtape } from "../mixtapes";
 import { EditMixtapeSchema } from "~/schema/mixtape";
 import { Mixtape, Song } from "@prisma/client";
@@ -43,7 +43,9 @@ export const mixtapesRouter = createTRPCRouter({
       },
     });
 
-    await ctx.redis.set("mixtapes:" + auth.userId, mixtapes);
+    await ctx.redis.set("mixtapes:" + auth.userId, mixtapes, {
+      ex: 60 * 60 * 12,
+    });
 
     return mixtapes;
   }),
@@ -168,13 +170,21 @@ export const mixtapesRouter = createTRPCRouter({
         where: {
           id: input.id,
         },
-        data: input.mixtape,
+        data: {
+          ...input.mixtape,
+          title: isEmpty(input.mixtape.title) ? null : input.mixtape.title,
+          description: isEmpty(input.mixtape.description)
+            ? null
+            : input.mixtape.description,
+        },
         include: {
           songs: true,
         },
       });
 
-      await ctx.redis.set(`mixtape:${input.id}`, updatedMixtape);
+      await ctx.redis.set(`mixtape:${input.id}`, updatedMixtape, {
+        ex: 60 * 60 * 12,
+      });
       await ctx.redis.del("mixtapes:" + auth.userId);
 
       return updatedMixtape;

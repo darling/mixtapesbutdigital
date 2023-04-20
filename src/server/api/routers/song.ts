@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import { isEmpty } from "lodash-es";
 import { z } from "zod";
 import { EditSongSchema } from "~/schema/song";
 
@@ -48,8 +49,16 @@ export const songRouter = createTRPCRouter({
         },
         data: {
           ...input.song,
+          pre_description: isEmpty(input.song.pre_description)
+            ? null
+            : input.song.pre_description,
+          post_description: isEmpty(input.song.post_description)
+            ? null
+            : input.song.post_description,
         },
       });
+
+      await ctx.redis.del(`mixtape:${song.Mixtape.id}`);
 
       return updatedSong;
     }),

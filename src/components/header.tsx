@@ -4,6 +4,7 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { Container } from "./ui/container";
 import Link from "next/link";
+import * as Avatar from "@radix-ui/react-avatar";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -62,11 +63,18 @@ export const Header = () => {
                       <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        {/* <img
                           className="h-8 w-8 rounded-full"
                           src={user?.profileImageUrl}
                           alt="profile image"
-                        />
+                        /> */}
+                        <Avatar.Root className="h-8 w-8 overflow-hidden rounded-full">
+                          <Avatar.Image
+                            src={user?.profileImageUrl}
+                            alt="profile image"
+                          />
+                          <Avatar.Fallback className="bg-indigo-500"></Avatar.Fallback>
+                        </Avatar.Root>
                       </Menu.Button>
                     </div>
                   ) : (
@@ -88,7 +96,7 @@ export const Header = () => {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-lg bg-stone-50 ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {menuNavigation.map((item) => (
                         <Menu.Item key={item.name}>
                           {({ active }) => (
@@ -109,7 +117,7 @@ export const Header = () => {
                           <button
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block w-full px-4 py-2 text-left text-sm text-gray-700"
+                              "block w-full px-4 py-2 text-left text-sm text-red-700"
                             )}
                             onClick={() => {
                               signOut().catch(console.error);
@@ -157,11 +165,18 @@ export const Header = () => {
                 <div className="flex items-center px-4">
                   <div className="flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    {/* <img
                       className="h-10 w-10 rounded-full"
                       src={user?.profileImageUrl}
                       alt="profile image"
-                    />
+                    /> */}
+                    <Avatar.Root className="h-10 w-10 rounded-full">
+                      <Avatar.Image
+                        src={user?.profileImageUrl}
+                        alt="profile image"
+                      />
+                      <Avatar.Fallback className="bg-gray-500"></Avatar.Fallback>
+                    </Avatar.Root>
                   </div>
                   <div className="ml-3">
                     <div className="text-base font-medium text-gray-800">

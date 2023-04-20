@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { Layout } from "~/components/layout";
 import { Container } from "~/components/ui/container";
 import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
-import { prisma } from "~/server/db";
+import { prisma, redis } from "~/server/db";
 import { api } from "~/utils/api";
 
 import type { Mixtape, Song } from "@prisma/client";
@@ -19,6 +19,8 @@ import { buildClerkProps, getAuth } from "@clerk/nextjs/server";
 import { BackButton } from "~/components/ui/back";
 import { MixtapeForm } from "~/components/ui/mixtape/edit/mixtape-form";
 import { Button } from "~/components/ui/buttons";
+import { getMixtape } from "~/server/api/mixtapes";
+import { MixtapeSongForm } from "~/components/ui/mixtape/edit/song-form";
 
 const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
   props
@@ -113,11 +115,9 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
           </div>
         </Container>
         <MixtapeForm mixtape={mixtapesRequest.data} />
-        {/* TODO: Create forms for these bad boys */}
         {songs.map((song) => (
           <div key={song.id}>
-            {song.track.name} -{" "}
-            {song.track.artists.map((artist) => artist.name).join(", ")}
+            <MixtapeSongForm song={song} />
           </div>
         ))}
       </Layout>
@@ -155,14 +155,7 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
     };
   }
 
-  const mixtape = await prisma.mixtape.findUnique({
-    where: {
-      id: parsedId,
-    },
-    include: {
-      songs: true,
-    },
-  });
+  const mixtape = await getMixtape(parsedId);
 
   if (!mixtape || mixtape.owner !== userId) {
     return {
@@ -175,10 +168,20 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (
     };
   }
 
-  const songs = await getTracks(
-    await getClientCredentialsToken(),
-    mixtape.songs.map((song) => song.spotifyId)
+  let songs = await redis.get<SpotifyApi.MultipleTracksResponse>(
+    `spotify:tracks:${mixtape.id}`
   );
+
+  if (!songs) {
+    songs = await getTracks(
+      await getClientCredentialsToken(),
+      mixtape.songs.map((song) => song.spotifyId)
+    );
+
+    await redis.set(`spotify:tracks:${mixtape.id}`, songs, {
+      ex: 60 * 30,
+    });
+  }
 
   return {
     props: {

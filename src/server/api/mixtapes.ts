@@ -42,7 +42,9 @@ export const getMixtape = async (id: string) => {
     return null;
   }
 
-  await redis.set(`mixtape:${id}`, mixtapeFromDb);
+  await redis.set(`mixtape:${id}`, mixtapeFromDb, {
+    ex: 60 * 60 * 12,
+  });
 
   return mixtapeFromDb;
 };

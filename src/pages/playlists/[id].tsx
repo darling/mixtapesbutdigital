@@ -8,9 +8,9 @@ import { Layout } from "~/components/layout";
 import { useState } from "react";
 import { TrackSelection } from "~/components/ui/spotify/track-selection";
 import { InformationCircleIcon, UsersIcon } from "@heroicons/react/24/solid";
-import { ChevronLeftIcon } from "@heroicons/react/24/outline";
 import * as Dialog from "@radix-ui/react-dialog";
 import { BackButton } from "~/components/ui/back";
+import { PageHeader } from "~/components/reusable/PageHeader";
 
 const Page: NextPage = () => {
   const { query } = useRouter();
@@ -38,7 +38,7 @@ const Page: NextPage = () => {
     setPostCreationAlert(true);
   };
 
-  const [postCreationAlert, setPostCreationAlert] = useState(true);
+  const [postCreationAlert, setPostCreationAlert] = useState(false);
 
   return (
     <>
