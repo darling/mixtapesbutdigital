@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
 import { getMixtape } from "../mixtapes";
+import { chain } from "lodash-es";
 
 export const spotifyRouter = createTRPCRouter({
   getPlaylists: publicProcedure
@@ -136,6 +137,7 @@ export const spotifyRouter = createTRPCRouter({
     .input(
       z.object({
         mixtapeId: z.string(),
+        trackIndex: z.number().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -177,10 +179,15 @@ export const spotifyRouter = createTRPCRouter({
       //   }
       // );
 
+      const uris = chain(trackIds)
+        .map((id) => `spotify:track:${id}`)
+        .slice(input.trackIndex ?? 0)
+        .value();
+
       await axios.put<SpotifyApi.PlayHistoryObject>(
         "https://api.spotify.com/v1/me/player/play",
         {
-          uris: trackIds.map((id) => `spotify:track:${id}`),
+          uris,
         },
         {
           headers: {

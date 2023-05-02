@@ -114,7 +114,14 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
             </div>
           </div>
         </Container>
-        <MixtapeForm mixtape={mixtapesRequest.data} />
+        <MixtapeForm
+          mixtape={mixtapesRequest.data}
+          invalidate={async () => {
+            const refetch = await mixtapesRequest.refetch();
+            if (!refetch.data) throw new Error("Mixtape not found");
+            return refetch.data;
+          }}
+        />
         {songs.map((song) => (
           <div key={song.id}>
             <MixtapeSongForm song={song} />

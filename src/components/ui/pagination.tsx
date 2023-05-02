@@ -39,14 +39,14 @@ export const Pagination: FC<PaginationProps> = ({
         </button>
       </div>
       <div className="hidden md:-mt-px md:flex">
-        {/* Current: "border-indigo-500 text-indigo-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
+        {/* Current: "border-stone-500 text-stone-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
         {pagesToDisplay.map((page) => (
           <button
             key={page}
             onClick={() => onPageChange(page - 1)}
             className={`inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 ${
               page === currentIndex + 1
-                ? "border-indigo-500 text-indigo-600"
+                ? "border-stone-500 text-stone-600"
                 : "border-transparent"
             }`}
           >

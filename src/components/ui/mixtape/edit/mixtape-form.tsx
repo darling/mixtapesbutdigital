@@ -15,9 +15,10 @@ import type { z } from "zod";
 
 interface MixtapeFormProps {
   mixtape: Mixtape;
+  invalidate: () => Promise<Mixtape>;
 }
 
-export const MixtapeForm: FC<MixtapeFormProps> = ({ mixtape }) => {
+export const MixtapeForm: FC<MixtapeFormProps> = ({ mixtape, invalidate }) => {
   const methods = useForm({
     defaultValues: {
       title: mixtape.title,
@@ -32,12 +33,10 @@ export const MixtapeForm: FC<MixtapeFormProps> = ({ mixtape }) => {
   });
 
   const mixtapeMutation = api.mixtapes.editMixtape.useMutation();
-  // eslint-disable-next-line @typescript-eslint/unbound-method
-  const { invalidate } = api.useContext();
 
   const {
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting, isSubmitted },
+    formState: { errors, isDirty, isSubmitting },
     reset,
   } = methods;
 
@@ -46,8 +45,16 @@ export const MixtapeForm: FC<MixtapeFormProps> = ({ mixtape }) => {
       id: mixtape.id,
       mixtape: data,
     });
+    const fresh = await invalidate();
 
-    await invalidate();
+    // take only the keys that we want to reset
+    const { title, description, public: isPublic } = fresh;
+
+    reset({
+      title,
+      description,
+      public: isPublic,
+    });
   };
 
   return (
@@ -70,11 +77,13 @@ export const MixtapeForm: FC<MixtapeFormProps> = ({ mixtape }) => {
               label="Description"
               description="If you want to add more information about your mixtape, you can do so here."
             />
-            <CheckBoxInput name="public" label="Public" />
-            <div
-              hidden={!isDirty || isSubmitting || isSubmitted}
-              className="col-span-full "
-            >
+            <CheckBoxInput
+              name="public"
+              label="Public"
+              description="Public mixtapes are visible and sharable to everyone. Private mixtapes can only be seen by you."
+            />
+
+            <div hidden={!isDirty || isSubmitting} className="col-span-full ">
               <div className="flex flex-row justify-end gap-4">
                 <Button.Basic
                   type="button"
@@ -86,7 +95,7 @@ export const MixtapeForm: FC<MixtapeFormProps> = ({ mixtape }) => {
                   Reset
                 </Button.Basic>
                 <Button.Primary
-                  disabled={Object.keys(errors).length > 0 || !isDirty}
+                  disabled={Object.keys(errors).length > 0}
                   type="submit"
                 >
                   Save

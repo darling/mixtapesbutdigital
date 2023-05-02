@@ -15,7 +15,7 @@ const Home: NextPage = () => {
         <Container>
           <div className="mx-auto max-w-3xl py-32 sm:py-48 lg:py-56">
             <div className="flex flex-col gap-8 text-center">
-              <h1 className="text-center font-serif text-4xl font-bold sm:text-6xl">
+              <h1 className="text-center text-4xl font-bold sm:text-6xl">
                 Lost?
               </h1>
               <p className="text-lg leading-8 tracking-wide">

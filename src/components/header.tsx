@@ -42,7 +42,7 @@ export const Header = () => {
                 />
               </Link>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                {/* Current: "border-indigo-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
+                {/* Current: "border-stone-500 text-gray-900", Default: "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700" */}
                 {navigation.map((item) => (
                   <Link
                     key={item.name}
@@ -60,7 +60,7 @@ export const Header = () => {
                 <Menu as="div" className="relative ml-3">
                   {isSignedIn ? (
                     <div>
-                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                      <Menu.Button className="flex rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2">
                         <span className="sr-only">Open user menu</span>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         {/* <img
@@ -73,7 +73,7 @@ export const Header = () => {
                             src={user?.profileImageUrl}
                             alt="profile image"
                           />
-                          <Avatar.Fallback className="bg-indigo-500"></Avatar.Fallback>
+                          <Avatar.Fallback className="bg-stone-500"></Avatar.Fallback>
                         </Avatar.Root>
                       </Menu.Button>
                     </div>
@@ -133,7 +133,7 @@ export const Header = () => {
               </div>
               <div className="-mr-2 flex items-center sm:hidden">
                 {/* Mobile menu button */}
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-stone-500">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -147,7 +147,7 @@ export const Header = () => {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
-              {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
+              {/* Current: "bg-stone-50 border-stone-500 text-stone-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
               {navigation.map((item) => (
                 <Link
                   key={item.name}

@@ -6,6 +6,7 @@ import { PageHeader } from "~/components/reusable/PageHeader";
 import { Button } from "~/components/ui/buttons";
 import { Container } from "~/components/ui/container";
 import { api } from "~/utils/api";
+import * as AlertDialog from "@radix-ui/react-alert-dialog";
 
 const Page: NextPage = () => {
   const { user } = useUser();
@@ -77,13 +78,51 @@ const Page: NextPage = () => {
                   <p>This action cannot be undone.</p>
                 </div>
                 <div className="mt-5">
-                  <Button.Danger
-                    onClick={() => {
-                      handleDelete().catch(console.error);
-                    }}
-                  >
-                    Delete Account
-                  </Button.Danger>
+                  <AlertDialog.Root>
+                    <AlertDialog.Trigger asChild>
+                      <button className="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-50">
+                        Delete Account
+                      </button>
+                    </AlertDialog.Trigger>
+                    <AlertDialog.Portal>
+                      <AlertDialog.Overlay className="fixed inset-0 bg-stone-900 bg-opacity-25 backdrop-blur-sm transition-opacity" />
+                      <AlertDialog.Content className="fixed inset-0 z-10 overflow-y-auto">
+                        <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                          <div className="relative transform overflow-hidden rounded-lg bg-stone-200 px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                            <div className="text-center sm:text-left">
+                              <AlertDialog.Title className="text-base font-semibold leading-6">
+                                Are you sure?
+                              </AlertDialog.Title>
+                              <div className="mt-2">
+                                <AlertDialog.Description className="text-sm">
+                                  All of your data will be permanently removed
+                                  from our servers forever. This action cannot
+                                  be undone.
+                                </AlertDialog.Description>
+                              </div>
+                            </div>
+                            <div className="mt-5 flex gap-4 sm:mt-4 sm:flex-row-reverse">
+                              <AlertDialog.Action asChild>
+                                <button
+                                  className="rounded-md bg-red-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                  onClick={() => {
+                                    handleDelete().catch(console.error);
+                                  }}
+                                >
+                                  Yes, I&apos;m sure
+                                </button>
+                              </AlertDialog.Action>
+                              <AlertDialog.Cancel asChild>
+                                <button className="rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                                  Cancel
+                                </button>
+                              </AlertDialog.Cancel>
+                            </div>
+                          </div>
+                        </div>
+                      </AlertDialog.Content>
+                    </AlertDialog.Portal>
+                  </AlertDialog.Root>
                 </div>
               </div>
             </div>

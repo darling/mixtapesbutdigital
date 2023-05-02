@@ -23,7 +23,7 @@ export const FormTextInput: FC<FormTextInputProps> = ({ name, label }) => {
           id={name}
           type="text"
           autoComplete="off"
-          className="block w-full rounded-md border-gray-300 shadow-sm invalid:border-red-500 invalid:text-red-500 invalid:placeholder-red-500 invalid:ring-2 invalid:ring-red-500 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="block w-full rounded-md border-gray-300 shadow-sm invalid:border-red-500 invalid:text-red-500 invalid:placeholder-red-500 invalid:ring-2 invalid:ring-red-500 focus:border-stone-500 focus:ring-stone-500 sm:text-sm"
           {...register(name)}
         />
       </div>

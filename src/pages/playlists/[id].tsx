@@ -67,7 +67,7 @@ const Page: NextPage = () => {
               <Link
                 href={`/mixtapes/${mixtapes.data?.id ?? ""}`}
                 type="button"
-                className="rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="rounded-md bg-stone-600 px-2.5 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-stone-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-600"
               >
                 Go to mixtape
               </Link>
@@ -101,7 +101,7 @@ const Page: NextPage = () => {
                   <a
                     href={spotifyRequest.data?.external_urls.spotify}
                     type="button"
-                    className="inline-flex items-center rounded-md border border-stone-400 px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="inline-flex items-center rounded-md border border-stone-400 px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-stone-500 focus:ring-offset-2"
                   >
                     On Spotify
                   </a>
@@ -111,7 +111,7 @@ const Page: NextPage = () => {
                   <button
                     type="button"
                     onClick={createMixtape}
-                    className="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
+                    className="inline-flex items-center rounded-md border border-transparent bg-stone-600 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
                     disabled={selectedSongs.length <= 0}
                   >
                     Create Mixtape

@@ -23,7 +23,7 @@ export const TrackSelection: FC<TrackSelectionProps> = ({
     <Toggle.Root
       className={classNames(
         "flex w-full items-center gap-4 rounded-md py-2 pr-2 text-left transition duration-100 disabled:opacity-50",
-        isSelected && "bg-indigo-600 text-white"
+        isSelected && "bg-stone-600 text-white"
       )}
       onPressedChange={() => onSelect(track)}
       pressed={isSelected}
@@ -31,8 +31,8 @@ export const TrackSelection: FC<TrackSelectionProps> = ({
     >
       <div
         className={classNames(
-          "aspect-square h-8 w-8 items-center justify-center rounded-md border border-stone-400 text-center font-serif text-2xl font-bold transition duration-100 disabled:cursor-not-allowed disabled:bg-red-200",
-          isSelected && "border-0 bg-indigo-600 text-white"
+          "aspect-square h-8 w-8 items-center justify-center rounded-md border border-stone-400 text-center text-2xl font-bold transition duration-100 disabled:cursor-not-allowed disabled:bg-red-200",
+          isSelected && "border-0 bg-stone-600 text-white"
         )}
       >
         {isSelected && selectedPosition}
