@@ -2,7 +2,6 @@ import {
   ArrowLongLeftIcon,
   ArrowLongRightIcon,
 } from "@heroicons/react/20/solid";
-import { chain } from "lodash-es";
 import type { FC } from "react";
 
 interface PaginationProps {
@@ -17,10 +16,6 @@ export const Pagination: FC<PaginationProps> = ({
   onPageChange,
 }) => {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  const pagesToDisplay = chain(pages)
-    .drop(currentIndex - 2)
-    .take(5)
-    .value();
 
   return (
     <nav className="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0">
@@ -40,15 +35,15 @@ export const Pagination: FC<PaginationProps> = ({
       </div>
       <div className="hidden md:-mt-px md:flex">
         {/* Current: "border-stone-500 text-stone-600", Default: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" */}
-        {pagesToDisplay.map((page) => (
+        {pages.map((page) => (
           <button
             key={page}
             onClick={() => onPageChange(page - 1)}
-            className={`inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700 ${
-              page === currentIndex + 1
+            className={`${
+              page - 1 === currentIndex
                 ? "border-stone-500 text-stone-600"
-                : "border-transparent"
-            }`}
+                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+            } inline-flex items-center border-t-2 px-4 pt-4 text-sm font-medium`}
           >
             {page}
           </button>
