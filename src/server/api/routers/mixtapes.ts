@@ -41,6 +41,9 @@ export const mixtapesRouter = createTRPCRouter({
       where: {
         owner: auth.userId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     await ctx.redis.set("mixtapes:" + auth.userId, mixtapes, {
@@ -49,6 +52,51 @@ export const mixtapesRouter = createTRPCRouter({
 
     return mixtapes;
   }),
+  pagedMixtapes: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(50).default(10),
+        offset: z.number().min(0).default(0),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const auth = ctx.auth;
+
+      if (!auth || !auth.userId) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+        });
+      }
+
+      const cache = await ctx.redis.get<Mixtape[]>(
+        `mixtapes:${auth.userId}:${input.offset}:${input.limit}`
+      );
+
+      if (cache) {
+        return cache;
+      }
+
+      const mixtapes = await ctx.prisma.mixtape.findMany({
+        where: {
+          owner: auth.userId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip: input.offset,
+        take: input.limit,
+      });
+
+      await ctx.redis.set(
+        `mixtapes:${auth.userId}:${input.offset}:${input.limit}`,
+        mixtapes,
+        {
+          ex: 60,
+        }
+      );
+
+      return mixtapes;
+    }),
   createMixtape: publicProcedure
     .input(
       z.object({

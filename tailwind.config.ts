@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+
 import { type Config } from "tailwindcss";
 
 export default {
@@ -6,7 +9,7 @@ export default {
     extend: {
       fontFamily: {
         serif: ["Sunset-Demi", "serif"],
-        sans: ["Rubik", "sans-serif"],
+        sans: ["Inter var", "sans-serif"],
       },
     },
   },

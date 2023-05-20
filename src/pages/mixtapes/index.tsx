@@ -5,6 +5,7 @@ import Link from "next/link";
 import { api } from "~/utils/api";
 import { Layout } from "~/components/layout";
 import { Container } from "~/components/ui/container";
+import { MixtapeCoverDesign } from "~/components/mixtape/mixtape";
 
 const Page: NextPage = () => {
   const { user, isSignedIn } = useUser();
@@ -28,26 +29,24 @@ const Page: NextPage = () => {
       <Layout>
         <Container>
           <h1 className="text-4xl font-bold">Mixtapes</h1>
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid gap-8 lg:grid-cols-2">
             {mixtapesRequest.data?.map((mixtape) => {
               return (
                 <div key={mixtape.id}>
                   <Link href={`/mixtapes/${mixtape.id}`}>
-                    <div className="h-32 bg-stone-200">
-                      {mixtape.title || "Untitled Mixtape"}
+                    <div className="flex rounded-lg p-4 hover:bg-stone-300">
+                      <div className="aspect-square h-12 w-12 flex-shrink-0">
+                        <MixtapeCoverDesign
+                          id={mixtape.id}
+                          tiny
+                          highPerformance
+                        />
+                      </div>
+                      <div className="ml-4">
+                        <h2 className="text-lg font-bold">{mixtape.title}</h2>
+                      </div>
                     </div>
                   </Link>
-                  <div>
-                    <button
-                      onClick={() => {
-                        handleDelete(mixtape.id).catch((e) => {
-                          console.error(e);
-                        });
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
                 </div>
               );
             })}

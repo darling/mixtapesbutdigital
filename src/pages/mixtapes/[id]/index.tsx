@@ -18,12 +18,16 @@ import type {
 } from "next";
 import type { Mixtape, Song } from "@prisma/client";
 import type { MixtapeSong } from "~/types/song";
-import Link from "next/link";
 import { Button } from "~/components/ui/buttons";
+import { MixtapeCoverDesign } from "~/components/mixtape/mixtape";
+import { MixtapeSongTable } from "~/components/ui/mixtape/table";
+import { useSpotify } from "~/contexts/spotify-player";
+import Link from "next/link";
 
 const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
   props
 ) => {
+  const { playMixtape } = useSpotify();
   const { signIn } = useSignIn();
   const auth = useAuth();
   const router = useRouter();
@@ -85,6 +89,8 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
     };
   });
 
+  const { description } = mixtapesRequest.data;
+
   const title = mixtapesRequest.data.title || "Untitled Mixtape";
   const isOwner = auth.isSignedIn && auth.userId === mixtapesRequest.data.owner;
 
@@ -94,91 +100,79 @@ const Page: NextPage<InferGetServerSidePropsType<typeof getServerSideProps>> = (
         <title>{title}</title>
       </Head>
       <Layout>
-        <Container>
-          <div className="my-12">
-            <h1 className="pb-4 text-4xl font-bold leading-tight tracking-tight">
-              {title}
-            </h1>
-            <p
-              className="prose prose-xl"
-              hidden={!mixtapesRequest.data.description}
-            >
-              {mixtapesRequest.data.description}
-            </p>
-          </div>
-        </Container>
-        <Container>
-          <div>
-            <Button.Basic
-              onClick={() => {
-                playMixtapeOnSpotify().catch((err) => {
-                  console.error(err);
-                });
-              }}
-            >
-              {auth.isSignedIn ? "Play on Spotify" : "Sign in with Spotify"}
-            </Button.Basic>
-            {isOwner && (
-              <Link
-                className="ml-2 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-stone-900 shadow-sm ring-1 ring-inset ring-stone-300 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-50"
-                href={`/mixtapes/${id}/edit`}
-              >
-                Edit
-              </Link>
-            )}
-          </div>
-        </Container>
-        <div className="flex flex-col">
-          {songs.map((song, i) => (
-            <SongDisplay
-              key={song.id}
-              song={song}
-              index={i}
-              mixtape={mixtapesRequest.data}
-            />
-          ))}
-        </div>
-        <Container>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="prose">
-              <h2>What is this?</h2>
-              <p>
-                This is a mixtape. It&apos;s a collection of songs that someone
-                has put together for you to listen to. You can listen to it on
-                Spotify by clicking the button above.
+        <div className="px-4 lg:px-8">
+          <div className="mx-auto grid h-full w-full max-w-7xl grid-cols-1 lg:grid-cols-5 lg:gap-8">
+            <div className="order-1 h-full w-full lg:col-span-3 lg:pt-16">
+              <div className="pb-4 lg:pb-8">
+                <h1 className="mt-2 max-w-2xl py-2 text-4xl font-bold leading-7 sm:text-5xl sm:tracking-tight">
+                  {title}
+                </h1>
+                <p>a mixtape by {props.user}</p>
+              </div>
+              <p hidden={!description} className="prose lg:pb-8">
+                {description}
               </p>
-              <p>
-                The songs on each mixtape from this site can&apos;t be changed,
-                and each mixtape is unique.
-              </p>
-              <p>
-                Learn more about how this works <Link href="/about">here</Link>.
-              </p>
-            </div>
-            <div className="prose">
-              <h2>Share</h2>
-              <p>
-                You can share this mixtape with anyone by sending them this
-                link:
-              </p>
-              <div className="flex">
-                <span className="flex select-all items-center truncate rounded-l-md border-y border-l border-stone-300 bg-white pl-2 shadow-sm">
-                  https://mixtapesbut.digital/mixtapes/{id}
-                </span>
-                <Button.Basic
+              <div className="pt-4 lg:hidden lg:pb-8">
+                <button
                   onClick={() => {
-                    navigator.clipboard
-                      .writeText(`https://mixtapesbut.digital/mixtapes/${id}`)
-                      .catch(console.error);
+                    playMixtape(id);
                   }}
-                  className="inline flex-shrink-0 rounded-l-none"
+                  className="rounded-lg bg-stone-900 px-4 py-2 text-white"
                 >
-                  Copy Link
-                </Button.Basic>
+                  Play on Spotify
+                </button>
+                <Link
+                  href={`/mixtapes/${id}/edit`}
+                  passHref
+                  className="ml-4"
+                  hidden={!isOwner}
+                >
+                  Edit mixtape
+                </Link>
+              </div>
+              {songs.map((song, i) => {
+                return (
+                  <SongDisplay
+                    mixtape={mixtapesRequest.data}
+                    index={i}
+                    song={song}
+                    key={song.id}
+                  />
+                );
+              })}
+            </div>
+            <div className="order-first w-full lg:order-2 lg:col-span-2 lg:pt-12">
+              <div className="my-4 aspect-video w-full">
+                <MixtapeCoverDesign id={id} />
+              </div>
+              <div className="hidden lg:block">
+                <div>
+                  <div className="flex items-center pb-4">
+                    <button
+                      onClick={() => {
+                        playMixtape(id);
+                      }}
+                      className="rounded-lg bg-stone-900 px-4 py-2 text-white"
+                    >
+                      Play on Spotify
+                    </button>
+                    <Link
+                      href={`/mixtapes/${id}/edit`}
+                      passHref
+                      className="ml-4"
+                      hidden={!isOwner}
+                    >
+                      Edit mixtape
+                    </Link>
+                  </div>
+                </div>
+              </div>
+              <div className="sticky top-4 hidden lg:block">
+                <MixtapeSongTable songs={songs} />
               </div>
             </div>
           </div>
-        </Container>
+        </div>
       </Layout>
     </>
   );

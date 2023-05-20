@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 import axios from "axios";
 import { getClientCredentialsToken, getTracks } from "~/server/api/spotify";
 import { getMixtape } from "../mixtapes";
-import { chain } from "lodash-es";
+import { chain, first } from "lodash-es";
 
 export const spotifyRouter = createTRPCRouter({
   getPlaylists: publicProcedure
@@ -138,6 +138,7 @@ export const spotifyRouter = createTRPCRouter({
       z.object({
         mixtapeId: z.string(),
         trackIndex: z.number().optional(),
+        device_id: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -179,6 +180,28 @@ export const spotifyRouter = createTRPCRouter({
       //   }
       // );
 
+      // fetch if there's a device currently being used
+
+      const deviceResponse = await axios.get<SpotifyApi.UserDevicesResponse>(
+        "https://api.spotify.com/v1/me/player/devices",
+        {
+          headers: {
+            Authorization: `Bearer ${firstItem.token}`,
+          },
+        }
+      );
+
+      let device = deviceResponse.data.devices.find(
+        (device) => device.is_active
+      );
+
+      // if no device is active find the first device on here if theres any at all
+      if (!device) {
+        device = first(deviceResponse.data.devices);
+      }
+
+      const device_id = device?.id || input.device_id || undefined;
+
       const uris = chain(trackIds)
         .map((id) => `spotify:track:${id}`)
         .slice(input.trackIndex ?? 0)
@@ -193,6 +216,9 @@ export const spotifyRouter = createTRPCRouter({
           headers: {
             Authorization: `Bearer ${firstItem.token}`,
           },
+          params: {
+            device_id,
+          },
         }
       );
 
@@ -200,4 +226,24 @@ export const spotifyRouter = createTRPCRouter({
         message: "success",
       };
     }),
+  getToken: publicProcedure.query(async ({ ctx }) => {
+    const auth = ctx.auth;
+
+    if (!auth || !auth.sessionId) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    const session = await clerkClient.users.getUserOauthAccessToken(
+      auth.userId,
+      "oauth_spotify"
+    );
+
+    const firstItem = session[0] ?? null;
+
+    if (!firstItem) {
+      throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
+
+    return firstItem.token;
+  }),
 });
